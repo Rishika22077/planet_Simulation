@@ -1,0 +1,181 @@
+import pygame
+import math
+import sys
+
+pygame.init()
+
+# Window settings
+WIDTH, HEIGHT = 1000, 800
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Window title
+pygame.display.set_caption("Planet Motion Simulation")
+
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
+BLUE = (100, 149, 237)
+RED = (188, 39, 50)
+GRAY = (180, 180, 180)
+ORANGE = (255, 165, 0)
+
+CENTER_X = WIDTH // 2
+CENTER_Y = HEIGHT // 2
+
+clock = pygame.time.Clock()
+font = pygame.font.SysFont("Arial", 24)
+
+
+class Planet:
+
+    def __init__(self, name, color, a, b, speed, size):
+
+        self.name = name
+
+        self.color = color
+
+        self.a = a      # semi-major axis
+        self.b = b      # semi-minor axis
+
+        self.speed = speed
+
+        self.size = size
+
+        self.angle = 0
+
+    def update(self):
+
+        self.angle += self.speed
+
+    def get_position(self):
+
+        x = CENTER_X + self.a * math.cos(self.angle)
+
+        y = CENTER_Y + self.b * math.sin(self.angle)
+
+        return x, y
+
+    def get_velocity(self):
+
+        # velocity components for ellipse
+        vx = -self.a * self.speed * math.sin(self.angle)
+
+        vy = self.b * self.speed * math.cos(self.angle)
+
+        # total velocity magnitude
+        velocity = math.sqrt(vx**2 + vy**2)
+
+        return velocity
+
+    def draw(self, screen):
+
+        # Draw elliptical orbit
+        rect = pygame.Rect(
+            CENTER_X - self.a,
+            CENTER_Y - self.b,
+            2 * self.a,
+            2 * self.b
+        )
+
+        pygame.draw.ellipse(screen, GRAY, rect, 1)
+
+        # Planet position
+        x, y = self.get_position()
+
+        pygame.draw.circle(
+            screen,
+            self.color,
+            (int(x), int(y)),
+            self.size
+        )
+
+
+# Planets
+mercury = Planet("Mercury", GRAY, 80, 60, 0.05, 5)
+
+venus = Planet("Venus", ORANGE, 140, 120, 0.035, 8)
+
+earth = Planet("Earth", BLUE, 220, 200, 0.025, 10)
+
+mars = Planet("Mars", RED, 320, 280, 0.018, 7)
+
+planets = [mercury, venus, earth, mars]
+
+selected_planet = earth
+
+
+running = True
+
+while running:
+
+    clock.tick(60)
+
+    screen.fill(BLACK)
+
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            running = False
+
+        if event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_1:
+                selected_planet = mercury
+
+            elif event.key == pygame.K_2:
+                selected_planet = venus
+
+            elif event.key == pygame.K_3:
+                selected_planet = earth
+
+            elif event.key == pygame.K_4:
+                selected_planet = mars
+
+    # Draw Sun
+    pygame.draw.circle(
+        screen,
+        YELLOW,
+        (CENTER_X, CENTER_Y),
+        30
+    )
+
+    # Draw planets
+    for planet in planets:
+
+        planet.update()
+
+        planet.draw(screen)
+
+    # Show selected planet velocity
+    velocity = selected_planet.get_velocity()
+
+    info = [
+        f"Selected Planet: {selected_planet.name}",
+        f"Velocity: {round(velocity, 2)} units/frame"
+    ]
+
+    y_pos = 20
+
+    for line in info:
+
+        text = font.render(line, True, WHITE)
+
+        screen.blit(text, (20, y_pos))
+
+        y_pos += 40
+
+    # Controls
+    controls = font.render(
+        "Press 1-Mercury  2-Venus  3-Earth  4-Mars",
+        True,
+        WHITE
+    )
+
+    screen.blit(controls, (20, HEIGHT - 40))
+
+    pygame.display.update()
+
+pygame.quit()
+
+sys.exit()
