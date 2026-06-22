@@ -93,12 +93,5 @@ This project was developed to improve understanding of:
 - Object-Oriented Design
 - Event-Driven Programming
 
-## 👨‍💻 Author
-
-**Rishi**
-
-Student | Python Enthusiast | Exploring Physics, Astrophysics, and Simulation Programming
-
----
 
 ⭐ If you found this project interesting, consider giving it a star on GitHub!
